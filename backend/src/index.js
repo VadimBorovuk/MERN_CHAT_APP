@@ -24,15 +24,26 @@ app.use(cors({
 app.use('/api/auth/', AuthRoute);
 app.use('/api/messages/', MessageRoute);
 
-if (process.env.NODE_ENV === 'production'){
-  app.use(express.static(path.join(__dirname, "../frontend/dist")))
+// if (process.env.NODE_ENV === 'production'){
+//   app.use(express.static(path.join(__dirname, "../frontend/dist")))
+//
+//   app.use((req, res) => {
+//     res.sendFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
+//   });
+// }
 
-  // app.get('/*', (req, res) => {
-  //   res.sendFile((path.join(__dirname, "../frontend", "dist", "index.html")))
-  // })
+if (process.env.NODE_ENV === 'production') {
+  const frontendPath = path.join(__dirname, "../frontend/dist");
 
-  app.use((req, res) => {
-    res.sendFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
+  // Віддаємо статичні файли
+  app.use(express.static(frontendPath));
+
+  // Для всіх інших маршрутів (окрім /api) віддаємо index.html
+  app.get("*", (req, res, next) => {
+    if (req.path.startsWith("/api")) {
+      return next(); // віддати 404 якщо нема API
+    }
+    res.sendFile(path.join(frontendPath, "index.html"));
   });
 }
 
