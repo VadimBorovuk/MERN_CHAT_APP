@@ -6,7 +6,7 @@ import {IFormDataLogin} from "../pages/LoginPage";
 import {TypeProfileData} from "../pages/ProfilePage";
 import {io} from "socket.io-client";
 
-const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5004" : "/api"
+const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5004" : "/"
 
 export const useAuthStore = create((set, get) => ({
       authUser: null,
