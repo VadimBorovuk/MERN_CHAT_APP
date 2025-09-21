@@ -14,7 +14,9 @@ dotenv.config();
 const PORT = process.env.PORT || 5004;
 const __dirname = path.resolve()
 
-app.use(express.json())
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
+
 app.use(cookieParser())
 app.use(cors({
   origin: process.env.CLIENT_URL || "http://localhost:5173",
@@ -32,20 +34,23 @@ app.use('/api/messages/', MessageRoute);
 //   });
 // }
 
-if (process.env.NODE_ENV === 'production') {
-  const frontendPath = path.join(__dirname, "../frontend/dist");
 
-  // Віддаємо статичні файли
-  app.use(express.static(frontendPath));
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-  // Для всіх інших маршрутів (окрім /api) віддаємо index.html
-  app.get("*", (req, res, next) => {
-    if (req.path.startsWith("/api")) {
-      return next(); // віддати 404 якщо нема API
-    }
-    res.sendFile(path.join(frontendPath, "index.html"));
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
   });
 }
+
+// if (process.env.NODE_ENV === 'production') {
+//   const frontendPath = path.join(__dirname, "../frontend/dist");
+//   app.use(express.static(frontendPath));
+//   app.get("*", (req, res, next) => {
+//     if (req.path.startsWith("/api")) return next();
+//     res.sendFile(path.join(frontendPath, "index.html"));
+//   });
+// }
 
 server.listen(PORT, () => {
   console.log(`server start on http://localhost:${PORT}`);
